@@ -49,16 +49,16 @@ def read_settings_file(settings_excel_file):
         Created from the "samplenames" tab of the settings excel file.
     """
     # convert settings file to pandas dataframe, set the first column "User-defined variable" as the index
-    df_settings = pd.read_excel(settings_excel_file, sheetname = "settings").set_index("User-defined variable")
+    df_settings = pd.read_excel(settings_excel_file, sheet_name = "settings").set_index("User-defined variable")
     # extract the column with the settings as a pandas Series
     settings = df_settings["Value"]
     # read the settings file tab that contains a list of short names to describe the data
-    df_samplenames = pd.read_excel(settings_excel_file, sheetname="samplenames")
+    df_samplenames = pd.read_excel(settings_excel_file, sheet_name="samplenames")
     # open tab with list of files for analysis as a pandas dataframe (data frame files, dff)
-    dff = pd.read_excel(settings_excel_file, sheetname = "files")
+    dff = pd.read_excel(settings_excel_file, sheet_name = "files")
     # raise an error if there are empty values, except in the notes and comments column
     dff_data = dff.drop("notes & comments",axis=1)
-    inds = pd.Series(pd.isnull(dff_data).any(1).nonzero()[0])
+    inds = pd.Series(pd.isnull(dff_data).any(1).to_numpy().nonzero()[0])
     if len(inds) > 0:
         raise ValueError("\n\nThe 'files' tab of the excel settings appears to contain empty cells at row {}. "
                          "Please delete any partially filled rows. "
