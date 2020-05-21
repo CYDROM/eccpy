@@ -142,7 +142,7 @@ def calc_EC50(fn, dff, settings, t20):
 
     # extract the data file path, method (e.g. EC50), expected curveshape (S or Z), etc. from settings file
     data_file = dff.loc[fn, "response data file"]
-    print(data_file)
+    #print(data_file)
     method = "{ct}{pr}".format(ct=settings["calculation_type"],
                                pr=str(settings["percentage_response"]))
     dose_response_curveshape = settings["dose_response_curveshape"]
@@ -219,7 +219,7 @@ def calc_EC50(fn, dff, settings, t20):
             df_resp_all.loc[sLet_versamax, dosenum] = response_datapoint
 
         # create new DataFrame for Sample names (dfS)
-        dfS = pd.read_excel(dose_conc_excel_path, sheetname="samples", index_col=0)
+        dfS = pd.read_excel(dose_conc_excel_path, sheet_name="samples", index_col=0)
         # replace original index with the resp_assaytype
         dfS["orig_index"] = dfS.index
         assert resp_assaytype in dfS.columns
@@ -1123,7 +1123,9 @@ def calc_EC50(fn, dff, settings, t20):
             lg.draw_frame(False)
         # set the x-axis limit so that the legend does not hide too many data points
         # find the maximum dose concentration in the whole experiment for that day
-        maxAC = x_orig.max().max()
+        #print(type(x_orig.max()))
+        #maxAC = x_orig.max().max()
+        maxAC = x_orig.max()
         # # obtain the variable altering the extension of the x-axis
         # x_axis_extension_after_dosemax_in_summ_plot = dff.loc[fn, "x-axis extension in summary fig_0"]
         # #define the limit of the x-axis as the maximum dose conc.
@@ -1376,8 +1378,8 @@ def standardise_doseconc_data(fn, dff, df_dose_orig, df_resp_all, data_file_path
     #######################################################################################################
     if resp_machinetype == "generic":
             #load the data into two dataframes, 1) dose concentrations, 2) response data
-            df_dose_data = pd.read_excel(data_file_path, sheetname='dose')
-            df_resp_data = pd.read_excel(data_file_path, sheetname='response')
+            df_dose_data = pd.read_excel(data_file_path, sheet_name='dose')
+            df_resp_data = pd.read_excel(data_file_path, sheet_name='response')
 
             # drop any columns that are completely empty
             df_dose_data = df_dose_data.dropna(how="all", axis=1)
@@ -1544,8 +1546,8 @@ def standardise_doseconc_data(fn, dff, df_dose_orig, df_resp_all, data_file_path
     elif resp_machinetype == "fluostar":
         if resp_assaytype == "12wellplate":
             #load the data into two dataframes, 1) dose concentrations, 2) response data
-            df_resp = pd.read_excel(data_file_path, sheetname='A600', skiprows = 2)
-            df_amp_conc = pd.read_excel(data_file_path, sheetname='amp_conc', skiprows = 2)
+            df_resp = pd.read_excel(data_file_path, sheet_name='A600', skiprows = 2)
+            df_amp_conc = pd.read_excel(data_file_path, sheet_name='amp_conc', skiprows = 2)
             number_of_initial_A600_columns = df_resp.shape[1]
             #select only the useful data, assuming that the first 4 columns are ignored
             df_resp_data = df_resp.iloc[:,3:]
@@ -1691,7 +1693,8 @@ def examine_input_datafile(fn, dff):
             if resp_machinetype == "generic":
                 if resp_assaytype in ["vertical","horizontal"]:
                     try:
-                        df_identifier = pd.read_excel(data_file_path, sheetname="template_identifier")
+                        df_identifier = pd.read_excel(data_file_path, sheet_name="template_identifier")
+#print(df_identifier)
                         if dff.loc[fn, "response dataformat"] in df_identifier.columns:
                             dff.loc[fn, "resp_datafile_ok"] = True
                         else:
@@ -1704,7 +1707,7 @@ def examine_input_datafile(fn, dff):
                         raise tools.DatafileError("cannot open {a} file, {b}".format(a=resp_datafileformat,b=data_file_path))
             elif resp_machinetype == "fluostar":
                 try:
-                    df_resp = pd.read_excel(data_file_path, sheetname='A600', skiprows = 2)
+                    df_resp = pd.read_excel(data_file_path, sheet_name='A600', skiprows = 2)
                     if "A" in df_resp.iloc[0,0] and "X" in df_resp.iloc[0,1]:
                         dff.loc[fn, "resp_datafile_ok"] = True
                     else:
@@ -1790,7 +1793,7 @@ def read_versamax_txt_datafile(fn, dff, resp_assaytype):
         #remove the last two rows, which should contain "~End" and "Instrument type: Instrument serial number:"
         df_resp_orig = df_resp_orig.dropna()
     # create new dataframe "df_dose_orig" to contain the dose concentrations
-    df_dose_orig = pd.read_excel(dose_conc_excel_path, sheetname = resp_assaytype)
+    df_dose_orig = pd.read_excel(dose_conc_excel_path, sheet_name = resp_assaytype)
     df_resp_all = "temporary object, will be overwritten by standardisation of df_resp_orig, 12-well or 96well"
     return df_resp_orig, df_resp_all, df_dose_orig
 
